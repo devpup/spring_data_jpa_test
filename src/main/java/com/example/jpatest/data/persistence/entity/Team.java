@@ -1,10 +1,12 @@
 package com.example.jpatest.data.persistence.entity;
 
+import com.example.jpatest.data.dto.TeamDto;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @AllArgsConstructor
