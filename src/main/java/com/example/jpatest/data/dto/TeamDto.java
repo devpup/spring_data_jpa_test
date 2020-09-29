@@ -25,7 +25,8 @@ public class TeamDto {
                 .id(team.getId())
                 .name(team.getName())
                 .members(team.getMembers().stream()
-                        .map(Member::getId).collect(Collectors.toList()))
+                        .map(Member::getId)
+                        .collect(Collectors.toList()))
                 .build();
     }
 

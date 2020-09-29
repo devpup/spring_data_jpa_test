@@ -6,13 +6,18 @@ import com.example.jpatest.data.persistence.entity.Member;
 import com.example.jpatest.data.persistence.entity.MemberType;
 import com.example.jpatest.data.persistence.entity.Team;
 import com.example.jpatest.data.persistence.repository.MemberRepository;
+import com.example.jpatest.data.persistence.repository.MemberRepositorySupport;
 import com.example.jpatest.data.persistence.repository.TeamRepository;
+import com.example.jpatest.service.ExceptionFunction;
 import com.example.jpatest.service.JpaService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -20,6 +25,7 @@ import java.util.stream.Collectors;
 public class JpaServiceImpl implements JpaService {
 
     private final MemberRepository memberRepository;
+    private final MemberRepositorySupport memberRepositorySupport;
     private final TeamRepository teamRepository;
 
     @PostConstruct
@@ -46,13 +52,16 @@ public class JpaServiceImpl implements JpaService {
         );
     }
 
+    @Transactional
     @Override
     public List<MemberDto> getMemberList() {
+        queryDSLTest();
+
          return memberRepository.findAll().stream()
                  .map(MemberDto::from)
                  .collect(Collectors.toList());
     }
-
+    @Transactional
     @Override
     public List<TeamDto> getTeamList() {
         return teamRepository.findAll().stream()
@@ -60,4 +69,25 @@ public class JpaServiceImpl implements JpaService {
                 .collect(Collectors.toList());
     }
 
+    public void queryDSLTest() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<Member> memberList = memberRepositorySupport.findByName("memberA");
+
+        System.out.println("==================");
+        memberList.stream()
+                .map(MemberDto::from)
+                .map(wrap(objectMapper::writeValueAsString))
+                .forEach(System.out::println);
+        System.out.println("==================");
+    }
+
+    public static <T, R> Function<T, R> wrap(ExceptionFunction<T, R> f) {
+        return (T r) -> {
+            try {
+                return f.apply(r);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
 }
