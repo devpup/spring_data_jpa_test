@@ -1,29 +1,20 @@
 package com.example.jpatest.data.persistence.repository;
 
 import com.example.jpatest.data.persistence.entity.Member;
-import com.example.jpatest.data.persistence.entity.QMember;
-import com.example.jpatest.data.persistence.entity.QTeam;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.data.jpa.repository.JpaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.example.jpatest.data.persistence.entity.QMember.*;
-import static com.example.jpatest.data.persistence.entity.QTeam.*;
+import static com.example.jpatest.data.persistence.entity.QMember.member;
 
-//1번 방법 Support
 
-@Repository
-public class MemberRepositorySupport extends QuerydslRepositorySupport {
+@RequiredArgsConstructor
+public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
-
-    public MemberRepositorySupport(JPAQueryFactory queryFactory) {
-        super(Member.class);
-        this.queryFactory = queryFactory;
-    }
 
     public List<Member> findByName(String name) {
         return queryFactory
